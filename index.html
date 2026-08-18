@@ -323,11 +323,75 @@
     margin-top:8px;
   }
 
+  .cutoff-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+  .cutoff-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:3px;
+    padding:16px 16px 14px 16px;
+  }
+  .cutoff-card .cat-name{
+    font-family:'Source Serif 4',serif;
+    font-size:16px;
+    font-weight:700;
+    color:var(--navy);
+    margin-bottom:2px;
+  }
+  .cutoff-card .cat-vac{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+  }
+  .cutoff-card .predicted{
+    font-family:'Source Serif 4',serif;
+    font-size:30px;
+    font-weight:700;
+    color:var(--brick);
+    line-height:1;
+    margin-bottom:4px;
+  }
+  .cutoff-card .predicted-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .cutoff-card .meta-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:4px 0;
+    border-top:1px dotted var(--paper-line);
+  }
+  .cutoff-card .meta-row span:last-child{font-family:'JetBrains Mono',monospace;color:var(--ink);}
+  .cutoff-card .total-field{margin-top:10px;}
+  .cutoff-card .total-field label{
+    font-size:11px;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:4px;
+  }
+  .cutoff-card .total-field input{
+    width:100%;
+    height:32px;
+    font-size:13px;
+    border:1px solid var(--paper-line);
+    border-radius:2px;
+    padding:0 8px;
+    font-family:'JetBrains Mono',monospace;
+  }
   @media (max-width:600px){
     .form-grid{grid-template-columns:1fr;}
     .stat-strip{grid-template-columns:repeat(2,1fr);}
     .masthead h1{font-size:26px;}
     .scheme-panel{flex-direction:column;}
+    .cutoff-grid{grid-template-columns:1fr;}
   }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -410,7 +474,49 @@
   </section>
 
   <section>
-    <div class="section-label">Estimated interview shortlist cutoff</div>
+    <div class="section-label">Predicted cutoffs by category</div>
+    <div class="cutoff-grid">
+      <div class="cutoff-card">
+        <div class="cat-name">UR</div>
+        <div class="cat-vac">13 posts</div>
+        <div class="predicted" id="pred-UR">—</div>
+        <div class="predicted-label">Predicted written cutoff</div>
+        <div class="meta-row"><span>Candidates called</span><span id="called-UR">—</span></div>
+        <div class="meta-row"><span>Sample logged</span><span id="sample-UR">0</span></div>
+        <div class="total-field">
+          <label for="total-UR">Est. total appeared</label>
+          <input type="number" id="total-UR" value="300" min="1" step="1">
+        </div>
+      </div>
+      <div class="cutoff-card">
+        <div class="cat-name">ST</div>
+        <div class="cat-vac">10 posts</div>
+        <div class="predicted" id="pred-ST">—</div>
+        <div class="predicted-label">Predicted written cutoff</div>
+        <div class="meta-row"><span>Candidates called</span><span id="called-ST">—</span></div>
+        <div class="meta-row"><span>Sample logged</span><span id="sample-ST">0</span></div>
+        <div class="total-field">
+          <label for="total-ST">Est. total appeared</label>
+          <input type="number" id="total-ST" value="150" min="1" step="1">
+        </div>
+      </div>
+      <div class="cutoff-card">
+        <div class="cat-name">SC</div>
+        <div class="cat-vac">4 posts</div>
+        <div class="predicted" id="pred-SC">—</div>
+        <div class="predicted-label">Predicted written cutoff</div>
+        <div class="meta-row"><span>Candidates called</span><span id="called-SC">—</span></div>
+        <div class="meta-row"><span>Sample logged</span><span id="sample-SC">0</span></div>
+        <div class="total-field">
+          <label for="total-SC">Est. total appeared</label>
+          <input type="number" id="total-SC" value="80" min="1" step="1">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Register &mdash; detail view</div>
     <div class="register-controls">
       <div class="field slim">
         <label for="view-cat">Category</label>
@@ -424,7 +530,12 @@
         <label>Candidates called per official ratio</label>
         <div id="ratio-display" style="height:38px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--navy);">—</div>
       </div>
+      <div class="field slim">
+        <label for="total-applicants">Est. total appeared (category)</label>
+        <input type="number" id="total-applicants" value="300" min="1" step="1">
+      </div>
     </div>
+    <p style="font-size:12px;color:var(--ink-soft);margin:-8px 0 16px 0;">"Est. total appeared" is your best guess at how many candidates actually sat the written exam in this category — not how many have logged a score here. The prediction scales your logged sample against this number, since a register of ~100 entries is only a slice of the real exam-taking population. Adjust it as better information becomes available.</p>
 
     <div id="cutoff-callout-wrap"></div>
 
@@ -440,7 +551,7 @@
   </section>
 
   <div class="footnote">
-    How to read this: entries are self-reported against the written exam (85 marks) and not verified against any official answer key — treat the estimate as a rough signal, not a guarantee. The "candidates called" figure follows TPSC's published ratio: 1 vacancy calls 5 candidates, 2 vacancies call 8, and 3 or more vacancies call 3 times the number of vacancies — applied here per category using the combined vacancy count across all three departments (Industries &amp; Commerce IT, Home Jail, Finance Taxes). TPSC also calls any candidate tied with the last qualifying score, which this tool doesn't model. Department itself is assigned later by merit and stated preference, and vacancy numbers are subject to change if departments revise their requisition, so treat this as directional only. The final merit list combines written (85) and interview (15) marks. Check <a href="https://tpsc.tripura.gov.in/cut-off-marks" target="_blank" rel="noopener" style="color:var(--navy-soft);">tpsc.tripura.gov.in/cut-off-marks</a> for the official figure once released.
+    How to read this: entries are self-reported against the written exam (85 marks) and not verified against any official answer key. The prediction works by percentile, not raw rank: TPSC calls a fixed top slice of each category (1 vacancy \u2192 5 candidates, 2 \u2192 8, 3 or more \u2192 3\u00d7 vacancies, applied here per category using the combined vacancy count across all three departments). That slice is converted into a percentage of however many candidates you estimate actually appeared, then that same percentage is applied to your logged sample to find the predicted score \u2014 this avoids the mistake of reading the raw Nth-highest score off a small sample as if the sample were the whole applicant pool. The "estimated total appeared" number is a manual guess since TPSC hasn't published it; the prediction is only as good as that guess and your sample size. TPSC also calls any candidate tied with the last qualifying score, which this tool doesn't model. Department is assigned later by merit and stated preference, and vacancy numbers are subject to change if departments revise their requisition. The final merit list combines written (85) and interview (15) marks. Check <a href="https://tpsc.tripura.gov.in/cut-off-marks" target="_blank" rel="noopener" style="color:var(--navy-soft);">tpsc.tripura.gov.in/cut-off-marks</a> for the official figure once released.
   </div>
 
 </div>
@@ -490,6 +601,38 @@
     return entriesRef.push(entry);
   }
 
+  function predictCutoff(catEntries, vacancies, totalApplicants){
+    var called = officialCallCount(vacancies);
+    if(!totalApplicants || totalApplicants < called) totalApplicants = called;
+    var n = catEntries.length;
+    if(n === 0) return {called:called, n:0, score:null, idx:null};
+    var percentile = Math.min(called / totalApplicants, 1);
+    var idx = Math.ceil(percentile * n) - 1;
+    if(idx < 0) idx = 0;
+    if(idx > n - 1) idx = n - 1;
+    return {called:called, n:n, score:catEntries[idx].score, idx:idx, percentile:percentile};
+  }
+
+  function renderSummary(entries){
+    ['UR','ST','SC'].forEach(function(cat){
+      var vacancies = vacMap[cat];
+      var catEntries = entries.filter(function(e){ return e.cat === cat; })
+        .sort(function(a,b){ return b.score - a.score; });
+      var totalInput = document.getElementById('total-' + cat);
+      var totalApplicants = parseInt(totalInput.value, 10) || 1;
+      var result = predictCutoff(catEntries, vacancies, totalApplicants);
+
+      document.getElementById('called-' + cat).textContent = result.called;
+      document.getElementById('sample-' + cat).textContent = result.n;
+      var predEl = document.getElementById('pred-' + cat);
+      if(result.score === null){
+        predEl.textContent = '—';
+      } else {
+        predEl.textContent = fmt(result.score, 1);
+      }
+    });
+  }
+
   function fmt(n, d){
     d = (d === undefined) ? 1 : d;
     return Number(n).toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d});
@@ -514,6 +657,7 @@
       document.getElementById('stat-avg-all').textContent = '—';
     }
 
+    renderSummary(entries);
     renderRegister(entries);
   }
 
@@ -521,6 +665,8 @@
     var vCat = document.getElementById('view-cat').value;
     var vacancies = vacMap[vCat] || 1;
     var called = officialCallCount(vacancies);
+    var totalApplicants = parseInt(document.getElementById('total-applicants').value, 10) || 1;
+    if(totalApplicants < called) totalApplicants = called;
 
     document.getElementById('ratio-display').textContent = called + ' candidates (' + vacancies + ' posts \u00d7 ratio)';
 
@@ -537,20 +683,31 @@
       return;
     }
 
-    var cutoffIdx = Math.min(called, filtered.length) - 1;
-    if(cutoffIdx < 0) cutoffIdx = 0;
-    var cutoffScore = filtered[cutoffIdx].score;
+    var n = filtered.length;
+    var percentile = called / totalApplicants;
+    if(percentile > 1) percentile = 1;
+    var predIdx = Math.ceil(percentile * n) - 1;
+    if(predIdx < 0) predIdx = 0;
+    if(predIdx > n - 1) predIdx = n - 1;
+    var predictedScore = filtered[predIdx].score;
+
+    var confidenceNote = '';
+    if(n < 25){
+      confidenceNote = ' Sample is small (' + n + ' entries) \u2014 treat this as a very rough early signal.';
+    } else if(n < 60){
+      confidenceNote = ' Sample size (' + n + ') is moderate \u2014 the estimate will firm up as more people log scores.';
+    }
 
     calloutWrap.innerHTML =
       '<div class="cutoff-callout">' +
-        '<div class="big">' + fmt(cutoffScore,1) + '</div>' +
-        '<div class="txt">Estimated interview-shortlist line at rank <b>' + (cutoffIdx+1) + '</b> of <b>' + filtered.length + '</b> logged entries ' +
-        '(' + vacancies + ' ' + vCat + ' posts, ' + called + ' called per TPSC\u2019s ratio). Based on self-reported written scores only.</div>' +
+        '<div class="big">' + fmt(predictedScore,1) + '</div>' +
+        '<div class="txt">Predicted cutoff for <b>' + vCat + '</b>: TPSC calls the top <b>' + fmt(percentile*100,1) + '%</b> of ' + vCat + ' candidates (' +
+        called + ' of an assumed ' + totalApplicants + ' appeared). Applied to your ' + n + '\u2011entry sample, that lands at rank ' + (predIdx+1) + '.' + confidenceNote + '</div>' +
       '</div>';
 
     filtered.forEach(function(e, i){
       var tr = document.createElement('tr');
-      if(i === cutoffIdx){ tr.className = 'cutoff-row'; }
+      if(i === predIdx){ tr.className = 'cutoff-row'; }
       var when = new Date(e.ts);
       var whenStr = isNaN(when.getTime()) ? '' : when.toLocaleDateString();
       var label = e.cat + (e.ph ? ' (PH)' : '');
@@ -606,6 +763,13 @@
 
   document.getElementById('cat').addEventListener('change', refresh);
   document.getElementById('view-cat').addEventListener('change', refresh);
+  document.getElementById('total-applicants').addEventListener('input', refresh);
+  document.getElementById('total-applicants').addEventListener('change', refresh);
+  ['UR','ST','SC'].forEach(function(cat){
+    var el = document.getElementById('total-' + cat);
+    el.addEventListener('input', refresh);
+    el.addEventListener('change', refresh);
+  });
 
   if(isConfigured){
     entriesRef.on('value', function(snapshot){
