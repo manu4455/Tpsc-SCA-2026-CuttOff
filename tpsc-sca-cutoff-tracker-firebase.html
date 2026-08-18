@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TPSC SCA 2026 — Cutoff Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F4EC;
+    --paper-line:#DAD3C1;
+    --ink:#2A2823;
+    --ink-soft:#635F54;
+    --navy:#1B2A44;
+    --navy-soft:#3B4A66;
+    --amber:#B9832A;
+    --amber-deep:#7A551A;
+    --brick:#A23A2E;
+    --brick-bg:#F6E4E0;
+    --green:#3F6B41;
+    --green-bg:#E7EEE1;
+    --card:#FFFEFA;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    padding:0 0 60px 0;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px;}
+
+  .masthead{
+    border-bottom:3px solid var(--navy);
+    padding:36px 0 18px 0;
+    margin-bottom:28px;
+    position:relative;
+  }
+  .masthead::after{
+    content:"";
+    position:absolute;
+    bottom:-8px;left:0;right:0;
+    height:1px;
+    background:var(--navy);
+    max-width:880px;
+    margin:0 auto;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--amber-deep);
+    margin:0 0 10px 0;
+  }
+  .masthead h1{
+    font-family:'Source Serif 4',serif;
+    font-weight:700;
+    font-size:34px;
+    line-height:1.15;
+    margin:0 0 8px 0;
+    color:var(--navy);
+  }
+  .masthead p{
+    font-family:'Source Serif 4',serif;
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+    max-width:600px;
+  }
+
+  section{margin-bottom:36px;}
+  .section-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .section-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--paper-line);
+  }
+
+  /* Scheme panel */
+  .scheme-panel{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:3px;
+    padding:18px 22px;
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .scheme-col{flex:1;min-width:200px;}
+  .scheme-col h3{
+    font-family:'Source Serif 4',serif;
+    font-size:14px;
+    margin:0 0 8px 0;
+    color:var(--navy);
+  }
+  .scheme-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    padding:4px 0;
+    border-bottom:1px dotted var(--paper-line);
+  }
+  .scheme-row span:last-child{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--ink);}
+  .scheme-row.total{border-bottom:none;border-top:1px solid var(--paper-line);margin-top:4px;padding-top:8px;font-weight:600;}
+
+  /* Vacancy table */
+  .vac-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px;}
+  .vac-table th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink-soft);
+    padding:6px 8px;
+    border-bottom:1px solid var(--paper-line);
+    font-weight:600;
+  }
+  .vac-table td{
+    padding:6px 8px;
+    border-bottom:1px dotted var(--paper-line);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .vac-table tr:last-child td{border-bottom:none;font-weight:700;border-top:1px solid var(--paper-line);}
+
+  /* Form card */
+  .form-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:3px;
+    padding:24px;
+  }
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+    margin-bottom:18px;
+  }
+  .field label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field select, .field input{
+    width:100%;
+    height:38px;
+    border:1px solid var(--paper-line);
+    border-radius:2px;
+    background:#fff;
+    padding:0 10px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .field select:focus, .field input:focus{
+    outline:none;
+    border-color:var(--navy-soft);
+    box-shadow:0 0 0 1px var(--navy-soft);
+  }
+  .field-full{grid-column:1 / -1;}
+  .checkbox-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .checkbox-row input{width:auto;height:auto;}
+  .err-msg{
+    font-size:12px;
+    color:var(--brick);
+    margin-top:6px;
+    display:none;
+  }
+  .err-msg.show{display:block;}
+
+  .submit-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  button.primary{
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    border-radius:2px;
+    padding:10px 22px;
+    font-size:14px;
+    font-weight:600;
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+  }
+  button.primary:hover{background:var(--navy-soft);}
+  button.primary:active{transform:scale(0.98);}
+  .status-msg{
+    font-size:13px;
+    color:var(--green);
+    font-weight:500;
+  }
+
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--paper-line);
+    border:1px solid var(--paper-line);
+  }
+  .stat{
+    background:var(--card);
+    padding:16px 14px;
+  }
+  .stat .n{
+    font-family:'Source Serif 4',serif;
+    font-size:26px;
+    font-weight:700;
+    color:var(--navy);
+  }
+  .stat .l{
+    font-size:11px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    margin-top:2px;
+  }
+
+  .register-controls{
+    display:flex;
+    gap:12px;
+    align-items:flex-end;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .register-controls .field{min-width:150px;}
+  .register-controls .field.slim{min-width:120px;}
+
+  .ledger{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+  }
+  .ledger table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  .ledger thead th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--ink-soft);
+    padding:10px 14px;
+    border-bottom:1px solid var(--paper-line);
+    font-weight:600;
+  }
+  .ledger tbody td{
+    padding:8px 14px;
+    border-bottom:1px solid var(--paper-line);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+  }
+  .ledger tbody tr:last-child td{border-bottom:none;}
+  .ledger td.rank{color:var(--ink-soft);width:40px;}
+  .ledger td.score{font-weight:600;color:var(--navy);}
+  .cutoff-row td{
+    background:var(--brick-bg);
+    color:var(--brick);
+    font-weight:700;
+    border-top:1px dashed var(--brick);
+    border-bottom:1px dashed var(--brick);
+  }
+  .empty-note{
+    padding:28px 14px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13px;
+    font-family:'Source Serif 4',serif;
+    font-style:italic;
+  }
+
+  .cutoff-callout{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--green-bg);
+    border:1px solid var(--green);
+    border-radius:2px;
+    padding:14px 18px;
+    margin-bottom:16px;
+  }
+  .cutoff-callout .big{
+    font-family:'Source Serif 4',serif;
+    font-size:28px;
+    font-weight:700;
+    color:var(--green);
+  }
+  .cutoff-callout .txt{font-size:13px;color:var(--ink-soft);line-height:1.5;}
+  .cutoff-callout .txt b{color:var(--ink);}
+
+  .footnote{
+    font-size:12px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    border-top:1px solid var(--paper-line);
+    padding-top:16px;
+    margin-top:8px;
+  }
+
+  @media (max-width:600px){
+    .form-grid{grid-template-columns:1fr;}
+    .stat-strip{grid-template-columns:repeat(2,1fr);}
+    .masthead h1{font-size:26px;}
+    .scheme-panel{flex-direction:column;}
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <p class="eyebrow">Crowd-sourced &middot; Unofficial &middot; Advt. No. 19/2025, dated 12&#8209;06&#8209;2025</p>
+    <h1>TPSC Senior Computer Assistant, 2026</h1>
+    <p>A shared register for candidates to log their expected written-exam score and see a live, self-reported estimate of where the interview shortlisting line may fall. Department is assigned by merit and preference after the result, so it isn't logged here. Not affiliated with TPSC.</p>
+  </div>
+
+  <div id="config-banner" style="display:none;background:var(--brick-bg);border:1px solid var(--brick);color:var(--brick);font-size:13px;padding:12px 16px;border-radius:2px;margin-bottom:24px;">
+    Firebase isn't configured yet. Open this file and replace the placeholder values in <code>firebaseConfig</code> near the bottom of the script with your own project's config.
+  </div>
+
+  <section>
+    <div class="section-label">Exam scheme &amp; vacancies (as per Advt. 19/2025)</div>
+    <div class="scheme-panel">
+      <div class="scheme-col">
+        <h3>Written examination — 85 marks, 2 hours</h3>
+        <div class="scheme-row"><span>English</span><span>20</span></div>
+        <div class="scheme-row"><span>GK &amp; current affairs</span><span>20</span></div>
+        <div class="scheme-row"><span>Job-oriented (computers)</span><span>45</span></div>
+        <div class="scheme-row total"><span>Written total</span><span>85</span></div>
+        <div class="scheme-row total"><span>Interview / personality test</span><span>15</span></div>
+      </div>
+      <div class="scheme-col">
+        <h3>Category-wise vacancies (all 3 depts combined)</h3>
+        <table class="vac-table">
+          <tr><th>Category</th><th>Posts</th></tr>
+          <tr><td>UR</td><td>13</td></tr>
+          <tr><td>ST</td><td>10</td></tr>
+          <tr><td>SC</td><td>4</td></tr>
+          <tr><td>Total</td><td>27</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Log your score</div>
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="field field-full">
+          <label for="cat">Category</label>
+          <select id="cat">
+            <option value="UR">UR</option>
+            <option value="SC">SC</option>
+            <option value="ST">ST</option>
+          </select>
+          <div class="checkbox-row">
+            <input type="checkbox" id="ph">
+            <label for="ph" style="margin:0;font-weight:400;">Also claiming PH (persons with disability) horizontal reservation</label>
+          </div>
+        </div>
+        <div class="field field-full">
+          <label for="score">Your self-assessed written score (out of 85)</label>
+          <input type="number" id="score" min="0" max="85" step="0.05" placeholder="e.g. 52.5">
+          <div class="err-msg" id="score-err">Enter a score between 0 and 85.</div>
+        </div>
+      </div>
+      <div class="submit-row">
+        <button class="primary" id="submit-btn">Add my score to the register</button>
+        <span class="status-msg" id="status-msg"></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Register at a glance</div>
+    <div class="stat-strip" id="stat-strip">
+      <div class="stat"><div class="n" id="stat-total">0</div><div class="l">Total entries</div></div>
+      <div class="stat"><div class="n" id="stat-cat">0</div><div class="l">In this category</div></div>
+      <div class="stat"><div class="n" id="stat-avg">—</div><div class="l">Average score (category)</div></div>
+      <div class="stat"><div class="n" id="stat-avg-all">—</div><div class="l">Average score (all)</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Estimated interview shortlist cutoff</div>
+    <div class="register-controls">
+      <div class="field slim">
+        <label for="view-cat">Category</label>
+        <select id="view-cat">
+          <option value="UR">UR — 13 posts</option>
+          <option value="ST">ST — 10 posts</option>
+          <option value="SC">SC — 4 posts</option>
+        </select>
+      </div>
+      <div class="field slim" style="min-width:220px;">
+        <label>Candidates called per official ratio</label>
+        <div id="ratio-display" style="height:38px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--navy);">—</div>
+      </div>
+    </div>
+
+    <div id="cutoff-callout-wrap"></div>
+
+    <div class="ledger">
+      <table>
+        <thead>
+          <tr><th style="width:40px;">#</th><th>Score</th><th>Category</th><th>Logged</th></tr>
+        </thead>
+        <tbody id="ledger-body">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footnote">
+    How to read this: entries are self-reported against the written exam (85 marks) and not verified against any official answer key — treat the estimate as a rough signal, not a guarantee. The "candidates called" figure follows TPSC's published ratio: 1 vacancy calls 5 candidates, 2 vacancies call 8, and 3 or more vacancies call 3 times the number of vacancies — applied here per category using the combined vacancy count across all three departments (Industries &amp; Commerce IT, Home Jail, Finance Taxes). TPSC also calls any candidate tied with the last qualifying score, which this tool doesn't model. Department itself is assigned later by merit and stated preference, and vacancy numbers are subject to change if departments revise their requisition, so treat this as directional only. The final merit list combines written (85) and interview (15) marks. Check <a href="https://tpsc.tripura.gov.in/cut-off-marks" target="_blank" rel="noopener" style="color:var(--navy-soft);">tpsc.tripura.gov.in/cut-off-marks</a> for the official figure once released.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // ---- 1. Paste your own Firebase project config here ----
+  // Get this from: Firebase console -> Project settings -> General -> Your apps -> Web app
+  var firebaseConfig = {
+    apiKey: "AIzaSyBajJopjqphbus9pzRIwVv-Wf2lkPJs0E4",
+    authDomain: "tpsc-sca-2026-cutoff.firebaseapp.com",
+    databaseURL: "https://tpsc-sca-2026-cutoff-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "tpsc-sca-2026-cutoff",
+    storageBucket: "tpsc-sca-2026-cutoff.firebasestorage.app",
+    messagingSenderId: "480412596576",
+    appId: "1:480412596576:web:85a2147e4035335503c605"
+  };
+
+  var isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+  if(!isConfigured){
+    document.getElementById('config-banner').style.display = 'block';
+  }
+
+  var db = null;
+  var entriesRef = null;
+  if(isConfigured){
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    entriesRef = db.ref('entries');
+  }
+
+  var submitBtn = document.getElementById('submit-btn');
+  var statusMsg = document.getElementById('status-msg');
+  var scoreInput = document.getElementById('score');
+  var scoreErr = document.getElementById('score-err');
+  var vacMap = {UR:13, ST:10, SC:4};
+  var currentEntries = [];
+
+  function officialCallCount(v){
+    if(v === 1) return 5;
+    if(v === 2) return 8;
+    return v * 3;
+  }
+
+  function addEntry(entry){
+    if(!entriesRef) return Promise.reject(new Error('Firebase not configured'));
+    return entriesRef.push(entry);
+  }
+
+  function fmt(n, d){
+    d = (d === undefined) ? 1 : d;
+    return Number(n).toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d});
+  }
+
+  function render(entries){
+    var cat = document.getElementById('cat').value;
+
+    document.getElementById('stat-total').textContent = entries.length;
+    var inCat = entries.filter(function(e){ return e.cat === cat; });
+    document.getElementById('stat-cat').textContent = inCat.length;
+    if(inCat.length){
+      var avgCat = inCat.reduce(function(s,e){return s+e.score;},0) / inCat.length;
+      document.getElementById('stat-avg').textContent = fmt(avgCat,1);
+    } else {
+      document.getElementById('stat-avg').textContent = '—';
+    }
+    if(entries.length){
+      var avgAll = entries.reduce(function(s,e){return s+e.score;},0) / entries.length;
+      document.getElementById('stat-avg-all').textContent = fmt(avgAll,1);
+    } else {
+      document.getElementById('stat-avg-all').textContent = '—';
+    }
+
+    renderRegister(entries);
+  }
+
+  function renderRegister(entries){
+    var vCat = document.getElementById('view-cat').value;
+    var vacancies = vacMap[vCat] || 1;
+    var called = officialCallCount(vacancies);
+
+    document.getElementById('ratio-display').textContent = called + ' candidates (' + vacancies + ' posts \u00d7 ratio)';
+
+    var filtered = entries.filter(function(e){ return e.cat === vCat; });
+    filtered.sort(function(a,b){ return b.score - a.score; });
+
+    var body = document.getElementById('ledger-body');
+    body.innerHTML = '';
+    var calloutWrap = document.getElementById('cutoff-callout-wrap');
+
+    if(filtered.length === 0){
+      body.innerHTML = '<tr><td colspan="4"><div class="empty-note">No entries logged yet for this category. Be the first to add one above.</div></td></tr>';
+      calloutWrap.innerHTML = '';
+      return;
+    }
+
+    var cutoffIdx = Math.min(called, filtered.length) - 1;
+    if(cutoffIdx < 0) cutoffIdx = 0;
+    var cutoffScore = filtered[cutoffIdx].score;
+
+    calloutWrap.innerHTML =
+      '<div class="cutoff-callout">' +
+        '<div class="big">' + fmt(cutoffScore,1) + '</div>' +
+        '<div class="txt">Estimated interview-shortlist line at rank <b>' + (cutoffIdx+1) + '</b> of <b>' + filtered.length + '</b> logged entries ' +
+        '(' + vacancies + ' ' + vCat + ' posts, ' + called + ' called per TPSC\u2019s ratio). Based on self-reported written scores only.</div>' +
+      '</div>';
+
+    filtered.forEach(function(e, i){
+      var tr = document.createElement('tr');
+      if(i === cutoffIdx){ tr.className = 'cutoff-row'; }
+      var when = new Date(e.ts);
+      var whenStr = isNaN(when.getTime()) ? '' : when.toLocaleDateString();
+      var label = e.cat + (e.ph ? ' (PH)' : '');
+      tr.innerHTML =
+        '<td class="rank">' + (i+1) + '</td>' +
+        '<td class="score">' + fmt(e.score,1) + '</td>' +
+        '<td>' + label + '</td>' +
+        '<td>' + whenStr + '</td>';
+      body.appendChild(tr);
+    });
+  }
+
+  function refresh(){
+    render(currentEntries);
+  }
+
+  submitBtn.addEventListener('click', function(){
+    if(!isConfigured){
+      statusMsg.textContent = 'Firebase not configured yet \u2014 see the notice above.';
+      return;
+    }
+    var cat = document.getElementById('cat').value;
+    var ph = document.getElementById('ph').checked;
+    var scoreVal = scoreInput.value.trim();
+    var score = parseFloat(scoreVal);
+
+    if(scoreVal === '' || isNaN(score) || score < 0 || score > 85){
+      scoreErr.classList.add('show');
+      return;
+    }
+    scoreErr.classList.remove('show');
+
+    submitBtn.disabled = true;
+    statusMsg.textContent = 'Saving\u2026';
+
+    addEntry({cat:cat, ph:ph, score:score, ts:Date.now()})
+      .then(function(){
+        statusMsg.textContent = 'Added to the register.';
+        scoreInput.value = '';
+        document.getElementById('ph').checked = false;
+        submitBtn.disabled = false;
+        setTimeout(function(){ statusMsg.textContent=''; }, 2500);
+      })
+      .catch(function(){
+        statusMsg.textContent = 'Could not save \u2014 try again.';
+        submitBtn.disabled = false;
+      });
+  });
+
+  scoreInput.addEventListener('input', function(){
+    scoreErr.classList.remove('show');
+  });
+
+  document.getElementById('cat').addEventListener('change', refresh);
+  document.getElementById('view-cat').addEventListener('change', refresh);
+
+  if(isConfigured){
+    entriesRef.on('value', function(snapshot){
+      var val = snapshot.val() || {};
+      currentEntries = Object.keys(val).map(function(k){ return val[k]; });
+      render(currentEntries);
+    });
+  } else {
+    render([]);
+  }
+})();
+</script>
+</body>
+</html>
